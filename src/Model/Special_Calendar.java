@@ -235,6 +235,35 @@ public class Special_Calendar {
         }
         return calendar;
     }
+     public static ObservableList<Special_Calendar> specialCalendarChecker(){
+        ObservableList<Special_Calendar> calendar = FXCollections.observableArrayList();
+        try (Connection connection = DatabaseUtil.getConnection();
+            Statement statement = connection.createStatement()){
+            
+            ResultSet rs = statement.executeQuery("SELECT special_calendar_id as id,\n" +
+                                                    "       sc_type as type,\n" +
+                                                    "       sc_desc as description,\n" +
+                                                    "       attachment,\n" +
+                                                    "       start_date as startDate,\n" +
+                                                    "       end_date as endDate\n" +
+                                                    "FROM special_calendar");
+            
+            while (rs.next()) {
+                calendar.add(new Special_Calendar(
+              rs.getInt("id"),
+            rs.getString("type"),
+            rs.getString("description"),
+             rs.getString("attachment"),
+             rs.getDate("startDate"),
+              rs.getDate("endDate")
+    ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return calendar;
+    }
     
     public static void updateSpecialCalendar(int id, String type, String description, String attachment, Date startDate, Date endDate) throws SQLException {
     String insertQuery = "UPDATE special_calendar SET sc_type=?, sc_desc=?, attachment=?, start_date=?, end_date=? WHERE special_calendar_id=?";
@@ -258,8 +287,8 @@ public class Special_Calendar {
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(addQuery)) {
-
-           preparedStatement.setString(1, type);
+            
+            preparedStatement.setString(1, type);
             preparedStatement.setString(2, description);
             preparedStatement.setString(3, attachment);
             preparedStatement.setDate(4, (java.sql.Date) startDate);
